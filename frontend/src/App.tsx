@@ -1,38 +1,104 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// src/App.tsx
+import React from "react";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+} from "react-router-dom";
 
-import { LoginPage } from './pages/Auth/LoginPage';
-import { SignupPage } from './pages/Auth/SignUpPage';
-import { StudentDashboard } from './pages/student/StudentDashboard';
-import { ResearcherDashboard } from './pages/researcher/ResearcherDashboard';
-import { ResearchRepositoryPage } from './pages/researcher/ResearchRepositoryPage';
-import { TeacherDashboard } from './pages/teacher/TeacherDashboard';
-import { MentorDashboard } from './pages/mentor/MentorDashboard';
+import { Sidebar } from "./components/layout/Sidebar";
+import { Header } from "./components/layout/Header";
 
+// Auth pages
+import { Signup } from "./pages/Auth/Signup";
+import { Login } from "./pages/Auth/Login";
+
+// Company pages
+import { CompanyDashboard } from "./pages/company/CompanyDashboard";
+import CompanyProjects from "./pages/company/CompanyProjects";
+import CompanyTrustSafety from "./pages/company/CompanyTrustSafety";
+import CompanyNotifications from "./pages/company/CompanyNotifications";
+import CompanySettings from "./pages/company/CompanySettings";
+
+// Developer pages
+import { DeveloperDashboard } from "./pages/developer/DeveloperDashboard";
+import ActiveWork from "./pages/developer/ActiveWork";
+import Earnings from "./pages/developer/Earnings";
+import MyApplications from "./pages/developer/MyApplications";
+import ExploreProjects from "./pages/developer/ExploreProjects";
+import DeveloperVerification from "./pages/developer/DeveloperVerification";
+import DeveloperSettings from "./pages/developer/DeveloperSettings";
+import Certificates from "./pages/notifications/Certificates";
+
+/* ---------------------------------
+   Layout for authenticated dashboards
+---------------------------------- */
+const DashboardLayout = ({ role }: { role: "company" | "developer" }) => {
+  return (
+    <div className="min-h-screen bg-zinc-50 flex">
+      <Sidebar role={role} />
+
+      <div className="flex-1 flex flex-col md:ml-64">
+        <Header role={role} />
+
+        <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  );
+};
+
+/* ---------------------------------
+   App Router
+---------------------------------- */
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <Routes>
-        {/* ───── Public Routes ───── */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-
-        {/* ───── App Routes ───── */}
-        <Route path="/student/*" element={<StudentDashboard />} />
-        <Route path="/teacher/*" element={<TeacherDashboard />} />
-        <Route path="/mentor/*" element={<MentorDashboard />} />
-
-
-        <Route path="/researcher/*" element={<ResearcherDashboard />} />
-        <Route path="/researcher/repo" element={<ResearchRepositoryPage />} />
-
-        {/* ───── Root Redirect ───── */}
+        {/* Default */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* ───── Catch All ───── */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Auth */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* ================= COMPANY ROUTES ================= */}
+        <Route
+          path="/company"
+          element={<DashboardLayout role="company" />}
+        >
+          <Route index element={<CompanyDashboard />} />
+          <Route path="projects" element={<CompanyProjects />} />
+          <Route path="trust-safety" element={<CompanyTrustSafety />} />
+          <Route path="notifications" element={<CompanyNotifications />} />
+          <Route path="settings" element={<CompanySettings />} />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/company" replace />} />
+        </Route>
+
+        {/* ================= DEVELOPER ROUTES ================= */}
+        <Route
+          path="/developer"
+          element={<DashboardLayout role="developer" />}
+        >
+          <Route index element={<DeveloperDashboard />} />
+          <Route path="explore-projects" element={<ExploreProjects />} />
+          <Route path="my-applications" element={<MyApplications />} />
+          <Route path="active-work" element={<ActiveWork />} />
+          <Route path="earnings" element={<Earnings />} />
+          <Route path="verify" element={<DeveloperVerification />} />
+          <Route path="notifications/certificates" element={<Certificates />} />
+          <Route path="settings" element={<DeveloperSettings />} />
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/developer" replace />} />
+        </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
